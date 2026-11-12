@@ -125,11 +125,12 @@ export default function SafetyPage() {
           <h1 className="font-display font-bold text-2xl text-[#171B19]">Safety & Emergency SOS</h1>
           <p className="text-sm text-[#6b6b5e] mt-1">One tap sends an alert to all GenZ Hikers members.</p>
         </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+        <div className={[
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border",
           isOnline ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-600"
-        }`}>
+        ].join(" ")}>
           {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-          {isOnline ? "Online" : "Offline"}
+          <span>{isOnline ? "Online" : "Offline"}</span>
         </div>
       </div>
 
@@ -179,15 +180,20 @@ export default function SafetyPage() {
                 <span className="text-4xl">{EMERGENCY_TYPES.find(e=>e.id===selectedType)?.emoji}</span>
                 <h2 className="text-white font-bold text-xl mt-2">{selectedType}</h2>
               </div>
-              <div className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
+              <div className={[
+                "flex items-center gap-2 rounded-xl px-4 py-3 text-sm",
                 location ? "bg-green-900/50 border border-green-700/40 text-green-300"
                 : gettingLoc ? "bg-blue-900/50 border border-blue-700/40 text-blue-300"
                 : "bg-white/10 border border-white/15 text-white/50"
-              }`}>
+              ].join(" ")}>
                 <Navigation className="w-4 h-4 flex-shrink-0" />
-                {location ? `GPS captured: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`
-                  : gettingLoc ? "Getting your GPS location\u2026"
-                  : "GPS not available \u2014 city will be used"}
+                <span>
+                  {location
+                    ? `GPS captured: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`
+                    : gettingLoc
+                    ? "Getting your GPS location..."
+                    : "GPS not available — city will be used"}
+                </span>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-red-200/60 leading-relaxed">
                 This will instantly notify <strong className="text-white">all GenZ Hikers members</strong> with your name, emergency type, GPS location, and your emergency contact details.
