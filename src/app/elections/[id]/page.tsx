@@ -389,7 +389,7 @@ export default function ElectionPage() {
                                     </button>
                                     {showManifesto && (
                                       <div className="bg-[#F5F4EF] rounded-xl p-3 text-xs text-gray-600 border border-gray-200 italic leading-relaxed">
-                                        "{cand.manifesto}"
+                                        &ldquo;{cand.manifesto}&rdquo;
                                       </div>
                                     )}
                                   </>

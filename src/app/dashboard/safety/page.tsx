@@ -186,8 +186,8 @@ export default function SafetyPage() {
               }`}>
                 <Navigation className="w-4 h-4 flex-shrink-0" />
                 {location ? `GPS captured: ${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}`
-                  : gettingLoc ? "Getting your GPS location…"
-                  : "GPS not available — city will be used"}
+                  : gettingLoc ? "Getting your GPS location\u2026"
+                  : "GPS not available \u2014 city will be used"}
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-red-200/60 leading-relaxed">
                 This will instantly notify <strong className="text-white">all GenZ Hikers members</strong> with your name, emergency type, GPS location, and your emergency contact details.
