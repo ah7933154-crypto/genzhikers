@@ -1,7 +1,7 @@
 "use client"
-import React, { useState } from "react"
+import React from "react"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Mountain, Leaf, Users, Globe, Heart, Compass, Camera, Shield } from "lucide-react"
 
 const goals = [
@@ -64,17 +64,13 @@ const goals = [
 ]
 
 function GoalCard({ goal, index }: { goal: typeof goals[0]; index: number }) {
-  const [hovered, setHovered] = useState(false)
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-      transition={{ duration: 0.6, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="group relative rounded-2xl overflow-hidden cursor-default border border-white/8 hover:border-white/20 transition-all duration-400"
+      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative rounded-2xl overflow-hidden cursor-default border border-white/8 hover:border-white/20 transition-colors duration-300"
       style={{ minHeight: 180 }}
     >
       {/* Background image — always present, dimmed by default */}
@@ -83,44 +79,29 @@ function GoalCard({ goal, index }: { goal: typeof goals[0]; index: number }) {
           src={goal.image}
           alt={goal.title}
           fill
-          className={`object-cover transition-all duration-700 ${hovered ? "scale-105 opacity-60" : "scale-100 opacity-25"}`}
+          className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-60 opacity-25"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           loading="lazy"
         />
         {/* Colour gradient overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${goal.color} ${hovered ? "opacity-70" : "opacity-85"} transition-opacity duration-500`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${goal.color} opacity-85 group-hover:opacity-70 transition-opacity duration-500`} />
       </div>
 
       {/* Content */}
       <div className="relative z-10 p-5 h-full flex flex-col justify-between">
         <div>
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 ${hovered ? "bg-[#A4AA83] shadow-lg" : "bg-[#A4AA83]/20"}`}>
-            <goal.icon className={`w-5 h-5 transition-colors duration-300 ${hovered ? "text-[#171B19]" : "text-[#A4AA83]"}`} />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 bg-[#A4AA83]/20 group-hover:bg-[#A4AA83] group-hover:shadow-lg">
+            <goal.icon className="w-5 h-5 text-[#A4AA83] group-hover:text-[#171B19] transition-colors duration-300" />
           </div>
           <h3 className="font-display font-bold text-white text-sm leading-tight mb-2">
             {goal.title}
           </h3>
         </div>
 
-        <AnimatePresence>
-          {hovered && (
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.25 }}
-              className="text-white/80 text-xs leading-relaxed mt-1"
-            >
-              {goal.description}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {!hovered && (
-          <p className="text-white/45 text-[11px] leading-relaxed line-clamp-2 mt-1">
-            {goal.description}
-          </p>
-        )}
+        {/* CSS transition — no state needed, pure group-hover */}
+        <p className="text-white/45 text-xs leading-relaxed line-clamp-2 mt-1 group-hover:text-white/80 group-hover:line-clamp-none transition-all duration-200">
+          {goal.description}
+        </p>
       </div>
     </motion.div>
   )
@@ -136,6 +117,7 @@ export default function GoalsSection() {
           src="https://images.pexels.com/photos/1365425/pexels-photo-1365425.jpeg?w=1920&q=60"
           alt=""
           fill
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-[#171B19]/60" />

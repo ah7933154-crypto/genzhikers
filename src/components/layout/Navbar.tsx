@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
@@ -31,12 +31,18 @@ export default function Navbar() {
   const [user, setUser] = useState<Profile | null>(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const pathname = usePathname()
-  const supabase = createClient()
+  // Create client once outside render cycle — not on every re-render
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
+    // rAF-throttled scroll handler — avoids thrashing on every scroll event
+    let rafId: number
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => setScrolled(window.scrollY > 20))
+    }
     window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () => { window.removeEventListener("scroll", handleScroll); cancelAnimationFrame(rafId) }
   }, [])
 
   useEffect(() => {
@@ -53,7 +59,7 @@ export default function Navbar() {
     }
     loadUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string } } | null) => {
       if (!session) setUser(null)
       else loadUser()
     })
@@ -93,7 +99,9 @@ export default function Navbar() {
                   src={LOGO_URL}
                   alt="GenZ Hikers"
                   fill
+                  sizes="36px"
                   className="object-cover"
+                  priority
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-[#173D35] text-white font-display font-bold text-sm -z-10">
                   GH

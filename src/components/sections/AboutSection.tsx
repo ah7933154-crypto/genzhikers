@@ -46,7 +46,7 @@ function ActivityCard({
             transition={{ duration: 0.35 }}
             className="absolute inset-0 z-0"
           >
-            <Image src={imageUrl} alt={label} fill className="object-cover scale-105" />
+            <Image src={imageUrl} alt={label} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0f2a24]/90 via-[#0f2a24]/40 to-transparent" />
           </motion.div>
         )}
@@ -148,15 +148,15 @@ export default function AboutSection() {
           >
             {/* Large image */}
             <div className="absolute top-0 left-0 w-[60%] h-[75%] rounded-2xl overflow-hidden shadow-xl">
-              <Image src={COMMUNITY_IMAGES[0]} alt="GenZ Hikers hiking" fill className="object-cover" />
+              <Image src={COMMUNITY_IMAGES[0]} alt="GenZ Hikers hiking" fill sizes="(max-width: 1024px) 60vw, 40vw" className="object-cover" />
             </div>
             {/* Small top-right */}
             <div className="absolute top-0 right-0 w-[37%] h-[47%] rounded-2xl overflow-hidden shadow-lg">
-              <Image src={COMMUNITY_IMAGES[1]} alt="GenZ Hikers trail" fill className="object-cover" />
+              <Image src={COMMUNITY_IMAGES[1]} alt="GenZ Hikers trail" fill sizes="(max-width: 1024px) 37vw, 25vw" className="object-cover" />
             </div>
             {/* Small bottom-right */}
             <div className="absolute bottom-0 right-0 w-[55%] h-[48%] rounded-2xl overflow-hidden shadow-lg">
-              <Image src={COMMUNITY_IMAGES[2]} alt="GenZ Hikers community" fill className="object-cover" />
+              <Image src={COMMUNITY_IMAGES[2]} alt="GenZ Hikers community" fill sizes="(max-width: 1024px) 55vw, 35vw" className="object-cover" />
             </div>
             {/* Accent badge */}
             <div className="absolute bottom-4 left-4 bg-[#173D35] text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
@@ -203,7 +203,7 @@ export default function AboutSection() {
           >
             {/* Background image */}
             <div className="absolute inset-0 opacity-15">
-              <Image src={COMMUNITY_IMAGES[3]} alt="" fill className="object-cover" />
+              <Image src={COMMUNITY_IMAGES[3]} alt="" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             </div>
             <div className="relative">
               <span className="text-xs font-semibold uppercase tracking-widest text-[#A4AA83] mb-3 block">

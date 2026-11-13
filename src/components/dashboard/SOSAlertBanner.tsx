@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { X, MapPin } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,13 +15,16 @@ interface SOSAlert {
 export default function SOSAlertBanner() {
   const [alerts, setAlerts] = useState<SOSAlert[]>([])
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
-  const supabase = createClient()
+  // Stable client reference — singleton from module
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    // Load any unread SOS notifications
+    let userId: string | null = null
+
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+      userId = user.id
       const { data } = await supabase
         .from("notifications")
         .select("id,title,message,link,created_at")
@@ -32,9 +35,7 @@ export default function SOSAlertBanner() {
         .limit(3)
       if (data && data.length > 0) {
         setAlerts(data)
-        // Vibrate on mobile when alert loads
         if ("vibrate" in navigator) navigator.vibrate([400, 150, 400, 150, 400])
-        // Play alert sound
         try {
           const ctx = new (window.AudioContext || (window as unknown as {webkitAudioContext: typeof AudioContext}).webkitAudioContext)()
           const playBeep = (freq: number, start: number) => {
@@ -53,7 +54,7 @@ export default function SOSAlertBanner() {
     }
     load()
 
-    // Real-time subscription for new SOS alerts
+    // Real-time subscription — reuse cached userId instead of re-fetching auth
     const channel = supabase
       .channel("sos_alerts")
       .on("postgres_changes", {
@@ -61,20 +62,18 @@ export default function SOSAlertBanner() {
         schema: "public",
         table: "notifications",
         filter: "type=eq.sos",
-      }, (payload) => {
-        // Check if this notification is for the current user
-        supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user && payload.new.user_id === user.id) {
-            const newAlert = payload.new as SOSAlert
-            setAlerts((prev) => [newAlert, ...prev].slice(0, 3))
-            if ("vibrate" in navigator) navigator.vibrate([400, 150, 400, 150, 400])
-          }
-        })
+      }, (payload: { new: Record<string, string> }) => {
+        // Use cached userId — no extra auth.getUser() call per event
+        if (userId && payload.new.user_id === userId) {
+          const newAlert = payload.new as unknown as SOSAlert
+          setAlerts((prev) => [newAlert, ...prev].slice(0, 3))
+          if ("vibrate" in navigator) navigator.vibrate([400, 150, 400, 150, 400])
+        }
       })
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [])
+  }, [supabase])
 
   const dismiss = async (id: string) => {
     setDismissed((prev) => new Set([...prev, id]))

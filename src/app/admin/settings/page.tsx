@@ -16,7 +16,7 @@ export default function AdminSettingsPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.from("community_settings").select("*").order("key").then(({ data }) => {
+    supabase.from("community_settings").select("*").order("key").then(({ data }: { data: Setting[] | null }) => {
       setSettings(data || [])
       const vals: Record<string, string> = {}
       data?.forEach((s) => { vals[s.key] = s.value || "" })

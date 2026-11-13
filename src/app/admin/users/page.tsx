@@ -45,7 +45,7 @@ export default function AdminUsersPage() {
     if (roleFilter !== "all") q = q.eq("role", roleFilter)
 
     const { data } = await q
-    const filtered = (data || []).filter((m) =>
+    const filtered = (data as Member[] || []).filter((m) =>
       !search || m.full_name?.toLowerCase().includes(search.toLowerCase()) || m.email?.toLowerCase().includes(search.toLowerCase())
     )
     setMembers(filtered)

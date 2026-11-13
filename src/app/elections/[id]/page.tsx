@@ -64,7 +64,7 @@ export default function ElectionPage() {
       setIsSenior(!!senior)
       setMyNominations(myNomsRes.data || [])
       const voteMap: Record<string, string> = {}
-      votesRes.data?.forEach((v) => { voteMap[v.position_id] = v.candidate_id })
+      votesRes.data?.forEach((v: { position_id: string; candidate_id: string }) => { voteMap[v.position_id] = v.candidate_id })
       setMyVotes(voteMap)
       setSelections(voteMap)
     }
@@ -79,14 +79,14 @@ export default function ElectionPage() {
     const rawCands = candRes.data || []
     let profileMap: Record<string, { full_name: string; avatar_url: string | null; city: string | null }> = {}
     if (rawCands.length > 0) {
-      const uids = [...new Set(rawCands.map((c) => c.user_id))]
+      const uids = [...new Set(rawCands.map((c: { user_id: string }) => c.user_id))]
       const { data: profs } = await supabase.from("profiles").select("id,full_name,avatar_url,city").in("id", uids)
-      if (profs) profileMap = Object.fromEntries(profs.map((p) => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url, city: p.city }]))
+      if (profs) profileMap = Object.fromEntries((profs as Array<{id:string;full_name:string;avatar_url:string|null;city:string|null}>).map((p) => [p.id, { full_name: p.full_name, avatar_url: p.avatar_url, city: p.city }]))
     }
 
     setElection(elRes.data)
     setPositions(posRes.data || [])
-    setCandidates(rawCands.map((c) => ({ ...c, profile: profileMap[c.user_id] || null })) as unknown as Candidate[])
+    setCandidates((rawCands as Array<{user_id:string;[key:string]:unknown}>).map((c) => ({ ...c, profile: profileMap[c.user_id] || null })) as unknown as Candidate[])
     setLoading(false)
   }, [id])
 

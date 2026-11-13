@@ -25,7 +25,7 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     // Listen for auth state — if the recovery token is in the URL hash,
     // Supabase JS client processes it automatically and sets the session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
       if (event === "PASSWORD_RECOVERY") {
         // Session is now active — user can set a new password
         toast("You can now set a new password.", { icon: "🔑" })

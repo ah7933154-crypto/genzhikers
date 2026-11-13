@@ -19,39 +19,44 @@ export interface MediaItem {
 export const CLOUDINARY_BASE = "https://res.cloudinary.com/vfr2vcm8"
 
 // Helper: auto-optimize Cloudinary image URLs
-export function optimizeImage(url: string, width = 800, quality = 80): string {
+// Uses c_limit (never upscales), f_auto (best format), q_auto (adaptive quality)
+export function optimizeImage(url: string, width = 800, quality = "auto"): string {
   if (!url.includes("cloudinary.com")) return url
-  return url.replace("/upload/", `/upload/w_${width},q_${quality},f_auto/`)
+  return url.replace("/upload/", `/upload/w_${width},c_limit,q_${quality},f_auto/`)
 }
 
-// Helper: get video thumbnail from Cloudinary video URL
+// Helper: get video thumbnail from Cloudinary — frame at 1s, 600px wide
 export function videoThumbnail(videoUrl: string): string {
   if (!videoUrl.includes("cloudinary.com")) return ""
-  return videoUrl.replace("/video/upload/", "/video/upload/so_2,w_800,f_jpg/").replace(".mp4", ".jpg")
+  return videoUrl
+    .replace("/video/upload/", "/video/upload/so_1,w_600,c_limit,f_jpg,q_auto/")
+    .replace(/\.mp4$/, ".jpg")
 }
 
 // ─── Member Photos (used in leadership section) ─────────────
+// w_400,c_fill,g_face — crop to face, 400px, best format
 export const MEMBER_PHOTOS: Record<string, string> = {
-  "Talat Hussain":     "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793965173/talat.jpg",
-  "Rizwan Ali":        "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793965117/Screenshot_2026-11-06_163809.png",
-  "Ali Haider":        "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793965761/mypic.jpg",
-  "Saad":              "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793965879/saad.jpg",
-  "Raheel Ahmed Khan": "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793965757/raheel.jpg",
-  "M. Qaswar":         "https://res.cloudinary.com/vfr2vcm8/image/upload/v1794418618/qaswar.jpg",
+  "Talat Hussain":     "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1793965173/talat.jpg",
+  "Rizwan Ali":        "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1793965117/Screenshot_2026-11-06_163809.png",
+  "Ali Haider":        "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1793965761/mypic.jpg",
+  "Saad":              "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1793965879/saad.jpg",
+  "Raheel Ahmed Khan": "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1793965757/raheel.jpg",
+  "M. Qaswar":         "https://res.cloudinary.com/vfr2vcm8/image/upload/w_400,c_fill,g_face,f_auto,q_auto/v1794418618/qaswar.jpg",
 }
 
 // ─── Logo ────────────────────────────────────────────────────
-export const LOGO_URL = "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793964982/logo.jpg"
+export const LOGO_URL = "https://res.cloudinary.com/vfr2vcm8/image/upload/w_160,c_fill,f_auto,q_auto/v1793964982/logo.jpg"
 
 // ─── Hero Video ──────────────────────────────────────────────
 export const HERO_VIDEO_URL = "https://res.cloudinary.com/vfr2vcm8/video/upload/v1793964519/hike_video1.mp4"
 
 // ─── Community Images (hero, about, sections) ───────────────
+// w_800,c_limit,f_auto,q_auto — responsive, never upscaled, best format
 export const COMMUNITY_IMAGES = [
-  "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793964200/genz_hikers1.jpg",
-  "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793964200/genz_hikers3.jpg",
-  "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793964199/genz_hikers2.jpg",
-  "https://res.cloudinary.com/vfr2vcm8/image/upload/v1793964198/genz_hikers4.jpg",
+  "https://res.cloudinary.com/vfr2vcm8/image/upload/w_800,c_limit,f_auto,q_auto/v1793964200/genz_hikers1.jpg",
+  "https://res.cloudinary.com/vfr2vcm8/image/upload/w_600,c_limit,f_auto,q_auto/v1793964200/genz_hikers3.jpg",
+  "https://res.cloudinary.com/vfr2vcm8/image/upload/w_600,c_limit,f_auto,q_auto/v1793964199/genz_hikers2.jpg",
+  "https://res.cloudinary.com/vfr2vcm8/image/upload/w_600,c_limit,f_auto,q_auto/v1793964198/genz_hikers4.jpg",
 ]
 
 // ─── Gallery Items — mirrors exactly what is in gallery_media DB ─────────────

@@ -67,7 +67,7 @@ export default function HikeContactsPage() {
           .select("id,full_name,email,phone,city,emergency_contact_name,emergency_contact_phone,emergency_contact_relation")
           .in("id", userIds)
 
-        const profileMap = Object.fromEntries((profiles || []).map((p) => [p.id, p]))
+        const profileMap = Object.fromEntries((profiles || []).map((p: { id: string; full_name: string; email: string; phone: string | null; city: string | null; emergency_contact_name: string | null; emergency_contact_phone: string | null; emergency_contact_relation: string | null }) => [p.id, p]))
         const enriched = allRegs.map((r: Registration) => ({ ...r, member: profileMap[r.user_id] || null }))
         setRegistrations(enriched)
       }

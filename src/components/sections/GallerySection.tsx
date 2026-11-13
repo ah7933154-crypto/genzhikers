@@ -133,7 +133,7 @@ function Lightbox({
 // ─── Gallery Item Card ───────────────────────────────────────
 function GalleryCard({ item, index, onClick }: { item: MediaItem; index: number; onClick: () => void }) {
   const [loaded, setLoaded] = useState(false)
-  const thumbUrl = item.thumbnail_url || item.url
+  const thumbUrl = getThumbUrl(item.thumbnail_url || item.url)
   // Vary aspect ratio for masonry feel
   const aspectMap = ["4/3", "1/1", "3/4", "16/9", "4/3", "1/1", "3/2", "2/3", "16/9", "1/1", "4/3", "3/4"]
   const aspect = aspectMap[index % aspectMap.length]
@@ -209,6 +209,11 @@ const FILTERS: { value: MediaCategory; label: string }[] = [
 ]
 
 // ─── Main Section ─────────────────────────────────────────────
+// Optimize Cloudinary thumbnail URLs for gallery display
+function getThumbUrl(url: string): string {
+  if (!url.includes("cloudinary.com") || url.includes("/upload/w_")) return url
+  return url.replace("/upload/", "/upload/w_600,c_limit,f_auto,q_auto/")
+}
 export default function GallerySection() {
   const [items, setItems] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -226,7 +231,7 @@ export default function GallerySection() {
 
       if (data) {
         // Map DB rows to MediaItem shape; infer category from media_type
-        const mapped: MediaItem[] = data.map((row) => ({
+        const mapped: MediaItem[] = (data as Array<{id:string;url:string;caption:string|null;media_type:string;thumbnail_url:string|null;photographer_name:string|null}>).map((row) => ({
           id:            row.id,
           media_type:    row.media_type as "image" | "video",
           url:           row.url,

@@ -115,7 +115,7 @@ export default function ElectionsSection() {
       setResults((resultsData as unknown as ElectionResult[]) || [])
 
       // Celebration: show for 30 min after results published
-      const celebrated = els.find((e) => {
+      const celebrated = els.find((e: Election) => {
         if (e.status !== "results_published" || !e.results_published_at) return false
         const publishedAt = new Date(e.results_published_at)
         const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000)

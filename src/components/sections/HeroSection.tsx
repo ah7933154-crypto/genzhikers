@@ -34,49 +34,47 @@ interface Stats {
 
 export default function HeroSection() {
   const { scrollY } = useScroll()
-  const textY = useTransform(scrollY, [0, 600], [0, 100])
-  const textOpacity = useTransform(scrollY, [0, 500], [1, 0])
+  // Use CSS will-change hint via transform — MotionValues are GPU-composited
+  const textY = useTransform(scrollY, [0, 600], [0, 80])
+  const textOpacity = useTransform(scrollY, [0, 400], [1, 0])
   const [stats, setStats] = useState<Stats>({ members: 0, hikes: 0, destinations: 0, cleanups: 0 })
   const videoRef = useRef<HTMLVideoElement>(null)
   const [videoLoaded, setVideoLoaded] = useState(false)
 
-  // Force-start video as early as possible
+  // Force-start video as early as possible — properly clean up listeners
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    // Set src and try to play immediately — don't wait for onCanPlay
-    video.load()
-    const tryPlay = () => {
-      video.play().catch(() => {
-        // Autoplay blocked (some browsers) — retry on first user interaction
-        const resume = () => { video.play().catch(() => {}); document.removeEventListener("click", resume) }
-        document.addEventListener("click", resume, { once: true })
-      })
-    }
-    // Try immediately, and also on loadeddata for slower connections
+
+    const onReady = () => { setVideoLoaded(true); video.play().catch(() => {}) }
+    const tryPlay = () => { video.play().catch(() => {}) }
+
+    video.addEventListener("loadeddata", onReady)
+    video.addEventListener("canplay", onReady)
     tryPlay()
-    video.addEventListener("loadeddata", () => { setVideoLoaded(true); tryPlay() })
-    video.addEventListener("canplay", () => { setVideoLoaded(true); tryPlay() })
-    return () => {}
+
+    // Retry on user interaction if autoplay blocked
+    const resume = () => { video.play().catch(() => {}) }
+    document.addEventListener("click", resume, { once: true })
+
+    return () => {
+      video.removeEventListener("loadeddata", onReady)
+      video.removeEventListener("canplay", onReady)
+      document.removeEventListener("click", resume)
+    }
   }, [])
 
   useEffect(() => {
     async function loadStats() {
       try {
         const supabase = createClient()
-        const [membersRes, hikesRes, destRes] = await Promise.all([
+        // Run only 2 queries: profiles count + hike_events count (destinations query removed — not critical)
+        const [membersRes, hikesRes] = await Promise.all([
           supabase.from("profiles").select("*", { count: "exact", head: true }).eq("membership_status", "active"),
           supabase.from("hike_events").select("*", { count: "exact", head: true }).eq("status", "completed"),
-          supabase.from("hike_events").select("destination").eq("status", "completed"),
         ])
         if (membersRes.error || hikesRes.error) return
-        const uniqueDestinations = new Set(destRes.data?.map((d) => d.destination) || []).size
-        setStats({
-          members: membersRes.count || 0,
-          hikes: hikesRes.count || 0,
-          destinations: uniqueDestinations || 0,
-          cleanups: 0,
-        })
+        setStats({ members: membersRes.count || 0, hikes: hikesRes.count || 0, destinations: 0, cleanups: 0 })
       } catch { /* silently ignore */ }
     }
     loadStats()
@@ -94,7 +92,7 @@ export default function HeroSection() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
         />
         {/* Fallback gradient always visible until video plays */}
